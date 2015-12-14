@@ -116,11 +116,20 @@ insert' :: Move -> Board -> Board
 insert' (V x y) (Board PV xBound yBound ops o) = Board PH xBound yBound ([(x, y)] ++ [(x, (y+1))] ++ ops) o
 insert' (H x y) (Board PH xBound yBound ops o) = Board PV xBound yBound ([(x, y)] ++ [((x+1), y)] ++ ops) o
 
-winning :: Board -> Bool
-winning board = if allowedMoves board == [] then True else False
+wins :: Board -> Bool
+wins board = if allowedMoves board == [] then True else False
 
 play :: Move -> Board -> Board
-play m (Board p x y xs o) = insert' m (Board p x y xs o)
+play m (Board p x y ops o) = insert' m (Board p x y ops o) 
+--in
+--    if wins phs
+--        then phs
+--        else Board PV x y ops (-1)
+--play m (Board PV x y ops o) = let pvs = insert' m (Board PV x y ops o) in
+--    if wins pvs
+--        then pvs
+--        else pvs
+--play m board = error "Bug when using function play."
 
 -- Ah. But what are the allowed moves in a give board? You tell me:
 
@@ -137,7 +146,7 @@ treeOf board = Fork board forest
   where
     forest :: [(Move,Tree)]
     forest 
-      | winning board = [] 
+      | wins board = [] 
       | otherwise     = [(m, treeOf(play m board)) | m <- allowedMoves board]
 
 -- Now we want to have the computer playing first, lazily against an
